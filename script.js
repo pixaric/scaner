@@ -46,6 +46,8 @@ function sendToSeaTable(decodedText) {
       }
     };
 
+    console.log("Enviando a SeaTable:", rowData);
+
     fetch(API_URL, {
       method: "POST",
       headers: {
@@ -55,8 +57,13 @@ function sendToSeaTable(decodedText) {
       body: JSON.stringify(rowData)
     })
     .then(res => res.json())
-    .then(data => console.log("Pedido enviado:", data))
-    .catch(err => console.error("Error al enviar:", err));
+    .then(data => {
+      console.log("Respuesta de SeaTable:", data);
+      alert("Pedido enviado correctamente");
+    })
+    .catch(err => {
+      console.error("Error al enviar:", err);
+      alert("Error al enviar el pedido");
+    });
   });
 }
-
