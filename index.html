@@ -8,22 +8,52 @@
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-    <h2>despligue</h2>
-  <div class="container">
-    <h1>Escáner de Código QR</h1>
-    <button id="scan-btn">Escanear</button>
-    <div id="reader" class="hidden"></div>
-    <p id="result"></p>
-  </div>
 
-  <div id="resumenPedido" >
-  <h3>Resumen del pedido</h3>
-  <p><strong>Mesa:</strong> <span id="resumenMesa"></span></p>
-  <p><strong>Notas:</strong> <span id="resumenNotas"></span></p>
-  <ul id="resumenProductos"></ul>
-  <button onclick="confirmarEnvio()">Confirmar y enviar</button>
-</div>
+  <header>
+    <h1>Escáner de Código QR</h1>
+  </header>
+
+  <main class="container">
+    <!-- Botón para activar el escáner -->
+    <button id="scan-btn">Escanear</button>
+
+    <!-- Área del escáner QR -->
+    <div id="reader" class="hidden"></div>
+
+    <!-- Resultado del escaneo -->
+    <p id="result"></p>
+
+    <!-- Resumen del pedido escaneado -->
+    <div id="resumenPedido" >
+      <h3>Resumen del pedido</h3>
+      <p><strong>Mesa:</strong> <span id="resumenMesa"></span></p>
+      <p><strong>Notas:</strong> <span id="resumenNotas"></span></p>
+      <ul id="resumenProductos"></ul>
+      <button onclick="confirmarEnvio()">Confirmar y enviar</button>
+    </div>
+
+    <!-- Generador de QR -->
+    <section id="generadorQR">
+      <h2>Generar QR de pedido</h2>
+      <label for="mesa">Mesa:</label>
+      <input type="text" id="mesa" placeholder="Número o nombre de mesa">
+
+      <label for="notas">Notas:</label>
+      <input type="text" id="notas" placeholder="Notas del pedido">
+
+      <div id="productos"></div>
+      <button onclick="agregarProducto()">Agregar producto</button>
+      <button onclick="generarQR()">Generar QR</button>
+
+      <!-- Contenedor del QR generado -->
+      <div id="qrcode" ></div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
+
+
+  <audio id="sendSound" src="message_sent.mp3" preload="auto"></audio>
+
 </body>
 </html>

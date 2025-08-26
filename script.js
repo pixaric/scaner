@@ -62,6 +62,8 @@ function confirmarEnvio() {
 
   if (!pedidoGlobal || !pedidoGlobal.pedido) {
     alert("No hay pedido para enviar.");
+    <audio id="sendSound" src="message_sent.mp3" preload="auto"></audio>
+
     return;
   }
 
