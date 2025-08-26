@@ -1,9 +1,12 @@
+// 🔧 Referencias a elementos del DOM
 const scanBtn = document.getElementById("scan-btn");
 const readerDiv = document.getElementById("reader");
 const resultP = document.getElementById("result");
 
-let html5QrCode;
+let html5QrCode;       // Instancia del escáner QR
+let pedidoGlobal;      // Pedido escaneado que se usará para enviar
 
+// 📷 Escaneo de código QR al hacer clic en el botón
 scanBtn.addEventListener("click", () => {
   readerDiv.classList.remove("hidden");
   scanBtn.disabled = true;
@@ -11,15 +14,15 @@ scanBtn.addEventListener("click", () => {
   html5QrCode = new Html5Qrcode("reader");
 
   html5QrCode.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
+    { facingMode: "environment" }, // Usa la cámara trasera
+    { fps: 10, qrbox: 250 },       // Configuración del escáner
     (decodedText) => {
       resultP.innerText = `Código escaneado: ${decodedText}`;
-      html5QrCode.stop();
+      html5QrCode.stop();         // Detiene el escaneo
       readerDiv.classList.add("hidden");
       scanBtn.disabled = false;
 
-      sendToSeaTable(decodedText);
+      mostrarResumen(decodedText); // Muestra el resumen del pedido
     },
     (errorMessage) => {
       console.warn("Error de escaneo:", errorMessage);
@@ -27,57 +30,108 @@ scanBtn.addEventListener("click", () => {
   );
 });
 
-function sendToSeaTable(decodedText) {
-  let pedido;
-
+// 📋 Muestra el resumen del pedido escaneado antes de enviarlo
+function mostrarResumen(decodedText) {
   try {
-    pedido = JSON.parse(decodedText);
-    console.log("JSON válido:", pedido);
+    const pedido = JSON.parse(decodedText);
+    pedidoGlobal = pedido;
+
+    document.getElementById("resumenMesa").textContent = pedido.mesa || pedido.cliente || "Sin mesa";
+    document.getElementById("resumenNotas").textContent = pedido.notas || "Sin notas";
+
+    const lista = document.getElementById("resumenProductos");
+    lista.innerHTML = "";
+    pedido.pedido.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.producto} (${item.tipo})`;
+      lista.appendChild(li);
+    });
+
+    document.getElementById("resumenPedido").style.display = "block";
   } catch (err) {
-    console.error("QR no contiene JSON válido:", err);
     alert("El código QR escaneado no contiene datos válidos.");
+    console.error("Error al interpretar el QR:", err);
+  }
+}
+
+// 📤 Envía el pedido escaneado a Baserow al confirmar
+function confirmarEnvio() {
+  const API_URL = "https://api.baserow.io/api/database/rows/table/654509/?user_field_names=true";
+  const API_TOKEN = "WqAoSylN4aSzpMwR4iQx4Bk0yw9bPOq5";
+
+  if (!pedidoGlobal || !pedidoGlobal.pedido) {
+    alert("No hay pedido para enviar.");
     return;
   }
 
-  const API_URL = "https://cloud.seatable.io/dtable-server/api/v1/rows/";
-
-  const API_TOKEN = "14d285b809b2f3a9e775a3a46bb2c13818c6a0f4";
-  const TABLE_NAME = "Pedidos";
-
-  pedido.pedido.forEach((item) => {
+  pedidoGlobal.pedido.forEach(item => {
     const rowData = {
-  table_name: "Pedidos",
-  row: {
-    Mesa: pedido.cliente,
-    Cliente: pedido.cliente,
-    Producto: item.producto,
-    Área: item.tipo,
-    Notas: pedido.notas || "",
-    Hora: new Date().toLocaleString()
-  }
-};
+      Mesa: pedidoGlobal.mesa || pedidoGlobal.cliente || "Sin mesa",
+      Producto: item.producto,
+      Área: item.tipo,
+      Notas: pedidoGlobal.notas || "",
+      Hora: new Date().toLocaleString()
+    };
 
+    console.log("Enviando a Baserow:", rowData);
 
-    console.log("Enviando a SeaTable:", rowData);
+    fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${API_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(rowData)
+    })
+    .then(res => res.json())
+    .then(data => console.log("✅ Pedido enviado:", data))
+    .catch(err => console.error("❌ Error al enviar:", err));
+  });
 
-    fetch("https://api.baserow.io/api/database/rows/table/TU_TABLE_ID/?user_field_names=true", {
-  method: "POST",
-  headers: {
-    "Authorization": "Token WqAoSylN4aSzpMwR4iQx4Bk0yw9bPOq5",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    Mesa: "Mesa 9",
-    Producto: "Té verde",
-    Área: "Cocina 2",
-    Notas: "Sin azúcar",
-    Hora: new Date().toLocaleString()
-  })
-})
-.then(res => res.json())
-.then(data => console.log("Pedido guardado en Baserow:", data))
-.catch(err => console.error("Error al enviar:", err));
+  alert("Pedido enviado correctamente");
+  document.getElementById("resumenPedido").style.display = "none";
+}
 
+// ➕ Agrega un nuevo producto al formulario de generación de QR
+function agregarProducto() {
+  const div = document.createElement("div");
+  div.className = "producto";
+  div.innerHTML = `
+    <input type="text" class="nombre" placeholder="Producto">
+    <select class="area">
+      <option value="Barra">Barra</option>
+      <option value="Cocina 1">Cocina 1</option>
+      <option value="Cocina 2">Cocina 2</option>
+    </select>
+  `;
+  document.getElementById("productos").appendChild(div);
+}
 
+// 🧾 Genera un código QR con los datos del formulario
+function generarQR() {
+  const cliente = document.getElementById("mesa").value;
+  const notas = document.getElementById("notas").value;
+  const productos = [];
+
+  document.querySelectorAll(".producto").forEach(p => {
+    const nombre = p.querySelector(".nombre").value;
+    const area = p.querySelector(".area").value;
+    if (nombre) {
+      productos.push({ producto: nombre, tipo: area });
+    }
+  });
+
+  const pedido = {
+    cliente,
+    pedido: productos,
+    notas
+  };
+
+  const qrContainer = document.getElementById("qrcode");
+  qrContainer.innerHTML = "";
+  new QRCode(qrContainer, {
+    text: JSON.stringify(pedido),
+    width: 250,
+    height: 250
   });
 }
