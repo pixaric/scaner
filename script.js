@@ -31,7 +31,7 @@ function sendToSeaTable(decodedText) {
   const pedido = JSON.parse(decodedText);
   const API_URL = "https://cloud.seatable.io/dtable-server/api/v1/rows/";
   const API_TOKEN = "14d285b809b23a9e775a346bb2c138186ca0f4";
-  const TABLE_NAME = "comanda";
+  const TABLE_NAME = "Pedidos";
 
   pedido.pedido.forEach((item) => {
     const rowData = {
@@ -59,3 +59,4 @@ function sendToSeaTable(decodedText) {
     .catch(err => console.error("Error al enviar:", err));
   });
 }
+
