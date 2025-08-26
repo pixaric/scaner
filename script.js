@@ -28,7 +28,17 @@ scanBtn.addEventListener("click", () => {
 });
 
 function sendToSeaTable(decodedText) {
-  const pedido = JSON.parse(decodedText);
+  let pedido;
+
+  try {
+    pedido = JSON.parse(decodedText);
+    console.log("JSON válido:", pedido);
+  } catch (err) {
+    console.error("QR no contiene JSON válido:", err);
+    alert("El código QR escaneado no contiene datos válidos.");
+    return;
+  }
+
   const API_URL = "https://cloud.seatable.io/dtable-server/api/v1/rows/";
   const API_TOKEN = "14d285b809b2f3a9e775a3a46bb2c13818c6a0f4";
   const TABLE_NAME = "Pedidos";
@@ -56,14 +66,19 @@ function sendToSeaTable(decodedText) {
       },
       body: JSON.stringify(rowData)
     })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .then(data => {
-      console.log("Respuesta de SeaTable:", data);
+      console.log("Pedido enviado:", data);
       alert("Pedido enviado correctamente");
     })
     .catch(err => {
       console.error("Error al enviar:", err);
-      alert("Error al enviar el pedido");
+      alert("Error al enviar el pedido: " + err.message);
     });
   });
 }
