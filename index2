@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de QR - Pedido</title>
+  <link rel="stylesheet" href="style2.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+</head>
+<body>
+  <div class="container">
+    <h1>Generador de Pedido QR</h1>
+
+    <label>Mesa:</label>
+    <input type="text" id="mesa" placeholder="Ej: Mesa 3">
+
+    <label>Notas:</label>
+    <input type="text" id="notas" placeholder="Ej: Sin azúcar">
+
+    <h3>Productos</h3>
+    <div id="productos">
+      <div class="producto">
+        <input type="text" class="nombre" placeholder="Producto">
+        <select class="area">
+          <option value="Barra">Barra</option>
+          <option value="Cocina 1">Cocina 1</option>
+          <option value="Cocina 2">Cocina 2</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="agregarProducto()">Agregar otro producto</button>
+    <button onclick="generarQR()">Generar QR</button>
+
+    <div id="qrcode"></div>
+  </div>
+
+  <script src="script2.js"></script>
+</body>
+</html>
