@@ -19,18 +19,43 @@ scanBtn.addEventListener("click", () => {
       readerDiv.classList.add("hidden");
       scanBtn.disabled = false;
 
-      // Simulación de envío a base de datos
-      fetch("https://tu-api.com/guardar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: decodedText })
-      })
-      .then(res => res.json())
-      .then(data => console.log("Datos guardados:", data))
-      .catch(err => console.error("Error al guardar:", err));
+      sendToSeaTable(decodedText);
     },
     (errorMessage) => {
       console.warn("Error de escaneo:", errorMessage);
     }
   );
 });
+
+function sendToSeaTable(decodedText) {
+  const pedido = JSON.parse(decodedText);
+  const API_URL = "https://cloud.seatable.io/dtable-server/api/v1/rows/";
+  const API_TOKEN = "14d285b809b2f3a9e775a3a46bb2c13818c6a0f4";
+  const TABLE_NAME = "comanda";
+
+  pedido.pedido.forEach((item) => {
+    const rowData = {
+      table_name: TABLE_NAME,
+      row: {
+        Mesa: pedido.cliente,
+        Cliente: pedido.cliente,
+        Producto: item.producto,
+        Área: item.tipo,
+        Notas: pedido.notas || "",
+        Hora: new Date().toLocaleString()
+      }
+    };
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${API_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(rowData)
+    })
+    .then(res => res.json())
+    .then(data => console.log("Pedido enviado:", data))
+    .catch(err => console.error("Error al enviar:", err));
+  });
+}
