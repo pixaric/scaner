@@ -76,16 +76,30 @@ function confirmarEnvio() {
     console.log("Enviando a Baserow:", rowData);
 
     fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": `Token ${API_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(rowData)
-    })
-    .then(res => res.json())
-    .then(data => console.log("✅ Pedido enviado:", data))
-    .catch(err => console.error("❌ Error al enviar:", err));
+  method: "POST",
+  headers: {
+    "Authorization": `Token ${API_TOKEN}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(rowData)
+})
+.then(res => {
+  console.log("Código de respuesta:", res.status);
+  return res.json();
+})
+.then(data => {
+  console.log("Respuesta de Baserow:", data);
+  if (data.error) {
+    alert("❌ Error: " + data.detail);
+  } else {
+    console.log("✅ Pedido enviado:", data);
+  }
+})
+.catch(err => {
+  console.error("❌ Error al enviar:", err);
+  alert("Error de conexión o formato: " + err.message);
+});
+
   });
 
   alert("Pedido enviado correctamente");
