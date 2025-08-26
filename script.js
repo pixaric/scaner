@@ -39,7 +39,7 @@ function sendToSeaTable(decodedText) {
     return;
   }
 
-  const API_URL = "https://cloud.seatable.io/dtable-server/api/v1/rows/";
+  const API_URL = "https://cloud.seatable.io/api/v2.1/dtables/a167a9d0-fd5b-4ca0-a209-4f0c5ffe95c0/rows/";
   const API_TOKEN = "14d285b809b2f3a9e775a3a46bb2c13818c6a0f4";
   const TABLE_NAME = "Pedidos";
 
@@ -67,9 +67,8 @@ function sendToSeaTable(decodedText) {
       body: JSON.stringify(rowData)
     })
     .then(res => {
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
+      console.log("Código de respuesta:", res.status);
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       return res.json();
     })
     .then(data => {
