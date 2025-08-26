@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos en tiempo real</title>
+  <link rel="stylesheet" href="ordenes.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📋 Pedidos en tiempo real</h1>
+
+    <!-- Filtro por categoría -->
+    <label for="filtro">Filtrar por área:</label>
+    <select id="filtro" onchange="filtrarPedidos()">
+      <option value="Todos">Todos</option>
+      <option value="Barra">Barra</option>
+      <option value="Cocina 1">Cocina 1</option>
+      <option value="Cocina 2">Cocina 2</option>
+    </select>
+
+    <!-- Lista de pedidos -->
+    <ul id="listaPedidos"></ul>
+  </div>
+
+  <script src="ordenes.js"></script>
+  
+</body>
+</html>
