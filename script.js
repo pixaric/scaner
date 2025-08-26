@@ -23,6 +23,7 @@ scanBtn.addEventListener("click", () => {
       scanBtn.disabled = false;
 
       mostrarResumen(decodedText); // Muestra el resumen del pedido
+      confirmarEnvio();          // Envía el pedido a Baserow
     },
     (errorMessage) => {
       console.warn("Error de escaneo:", errorMessage);
